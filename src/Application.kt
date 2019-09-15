@@ -2,7 +2,8 @@ package com.example
 
 import com.example.api.phrase
 import com.example.model.User
-import com.example.repository.InMemoryRepository
+import com.example.repository.DataBaseFactory
+import com.example.repository.EmojiPhrasesRepository
 import com.example.webapp.home
 import com.example.webapp.phrases
 import freemarker.cache.ClassTemplateLoader
@@ -54,12 +55,14 @@ fun Application.module(testing: Boolean = false) {
                 }
             }
         }
-        install(Locations)
         install(ContentNegotiation) {
             gson()
 
         }
-        val db = InMemoryRepository()
+        install(Locations)
+DataBaseFactory.init()
+
+        val db = EmojiPhrasesRepository()
         routing {
             static("/static") {
                 resources("images")

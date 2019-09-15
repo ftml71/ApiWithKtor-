@@ -41,4 +41,7 @@ dependencies {
     compile "com.zaxxer:HikariCP:$hikaricp_version"
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
 
+    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+
 }

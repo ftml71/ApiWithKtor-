@@ -2,6 +2,8 @@ package com.example.repository
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import model.EmojiPhrases
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -28,11 +30,18 @@ object DataBaseFactory {
     private fun hikari(): HikariDataSource {
         val config = HikariConfig()
 
-         config.driverClassName = "org.h2.Driver"
-        config.jdbcUrl = "jdbc:h2:mem:test"
+
+        config.driverClassName = "com.mysql.cj.jdbc.Driver"
+        config.jdbcUrl = "jdbc:mysql://ftml71:15101371@localhost:3306/ftml?useUnicode=true&serverTimezone=UTC"
         config.maximumPoolSize = 3
         config.isAutoCommit = false
-        config.setTransactionIsolation("TRANSACTION_REPEATABLE_READ")
+        config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
         return HikariDataSource(config)
     }
+
+    suspend fun <T> dbQuery(
+        block: () -> T): T =
+        withContext(Dispatchers.IO) {
+            transaction { block() }
+        }
 }
