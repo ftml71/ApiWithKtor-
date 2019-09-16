@@ -6,33 +6,33 @@
 //
 //class InMemoryRepository : Repository {
 //    private val idCounter = AtomicInteger()
-//    private val phrases = ArrayList<EmojiPhrase>()
-//    override suspend fun add(phrase: EmojiPhrase): EmojiPhrase {
-//        if (phrases.contains(phrase)) {
-//            return phrases.find { it == phrase }!!
+//    private val Movies = ArrayList<Movie>()
+//    override suspend fun add(post_description: Movie): Movie {
+//        if (Movies.contains(post_description)) {
+//            return Movies.find { it == post_description }!!
 //        }
-//        phrase.id = idCounter.incrementAndGet()
-//        phrases.add(phrase)
-//        return phrase
+//        post_description.id = idCounter.incrementAndGet()
+//        Movies.add(post_description)
+//        return post_description
 //    }
 //
-//    override suspend fun phrase(id: Int) = phrase(id.toString())
-//    override suspend fun phrase(id: String) = phrases.find { it.id.toString() == id }
-//        ?: throw IllegalArgumentException("No phrase found for $id.")
+//    override suspend fun post_description(id: Int) = post_description(id.toString())
+//    override suspend fun post_description(id: String) = Movies.find { it.id.toString() == id }
+//        ?: throw IllegalArgumentException("No post_description found for $id.")
 //
 //
-//    override suspend fun phrases() = phrases
+//    override suspend fun Movies() = Movies
 //
-//    override suspend fun remove(phrase: EmojiPhrase) {
-//        if (!phrases.contains(phrase)) {
-//            throw IllegalArgumentException("No phrase found for id ${phrase.id} ")
+//    override suspend fun remove(post_description: Movie) {
+//        if (!Movies.contains(post_description)) {
+//            throw IllegalArgumentException("No post_description found for id ${post_description.id} ")
 //        }
-//        phrases.remove(phrase)
+//        Movies.remove(post_description)
 //    }
 //
-//    override suspend fun remove(id: Int)=phrases.remove(phrase(id))
+//    override suspend fun remove(id: Int)=Movies.remove(post_description(id))
 //
-//    override suspend fun remove(id: String)=phrases.remove(phrase(id))
+//    override suspend fun remove(id: String)=Movies.remove(post_description(id))
 //
-//    override suspend fun clear() = phrases.clear()
+//    override suspend fun clear() = Movies.clear()
 //}

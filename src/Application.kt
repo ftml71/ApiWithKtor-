@@ -1,11 +1,11 @@
 package com.example
 
-import com.example.api.phrase
+import com.example.api.movie
 import com.example.model.User
 import com.example.repository.DataBaseFactory
-import com.example.repository.EmojiPhrasesRepository
+import com.example.repository.MoviesRepository
+import com.example.webapp.Movies
 import com.example.webapp.home
-import com.example.webapp.phrases
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
@@ -60,16 +60,16 @@ fun Application.module(testing: Boolean = false) {
 
         }
         install(Locations)
-DataBaseFactory.init()
+        DataBaseFactory.init()
 
-        val db = EmojiPhrasesRepository()
+        val db = MoviesRepository()
         routing {
             static("/static") {
                 resources("images")
             }
             home()
-            phrase(db)
-            phrases(db)
+            movie(db)
+            Movies(db)
         }
 
     }

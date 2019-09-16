@@ -1,22 +1,22 @@
 <#import "common/bootstrap.ftl" as b>
 
 <@b.page>
-    <#if phrases?? && (phrases?size >0 )>
+    <#if movies?? && (movies?size >0 )>
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>Emoji</th>
-                <th>Phrase</th>
+                <th>Title</th>
+                <th>Description</th>
             </tr>
             </thead>
             <tbody>
-            <#list phrases as phrase>
+            <#list movies as movie>
                 <tr>
-                    <td style="vertical-align: middle"><h3>${phrase.emoji}</h3></td>
-                    <td style="vertical-align: middle"><h3>${phrase.phrase}</h3></td>
+                    <td style="vertical-align: middle"><h3>${movie.post_title}</h3></td>
+                    <td style="vertical-align: middle"><h3>${movie.post_description}</h3></td>
                     <td class="col-md-1" style="text-align: center;vertical-align: middle">
-                        <form method="post" action="/phrases">
-                            <input type="hidden" name="id" value="${phrase.id}">
+                        <form method="post" action="/movies">
+                            <input type="hidden" name="id" value="${movie.id}">
                             <input type="hidden" name="action" value="delete">
                             <input type="image" src="/static/delete.png" width="24" height="24" border="0" alt="Delete" />
                         </form>
@@ -27,12 +27,12 @@
         </table>
     </#if>
     <div class="panel-body">
-        <form method="post" action="/phrases">
+        <form method="post" action="/movies">
             <input type="hidden" name="action" value="add" >
-            Emoji:<br>
-            <input type="text" name="emoji"/><br>
-            Phrase:<br>
-            <input type="text" name="phrase"/><br>
+            Title:<br>
+            <input type="text" name="post_title"/><br>
+            Description:<br>
+            <input type="text" name="post_description"/><br>
             <input type="submit" valus="submit"/>
         </form>
     </div>
