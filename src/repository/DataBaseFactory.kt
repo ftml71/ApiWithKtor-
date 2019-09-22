@@ -1,5 +1,6 @@
 package com.example.repository
 
+import com.example.model.Users
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers
@@ -15,8 +16,16 @@ object DataBaseFactory {
     fun init() {
         Database.connect(hikari())
         transaction {
+            SchemaUtils.drop(Movies)
+            SchemaUtils.drop(Users)
             SchemaUtils.create(Movies)
-
+            SchemaUtils.create(Users)
+//            Users.insert {
+//                it[id] = "ftml1371"
+//                it[email]="f_maleki@hotmail.com"
+//                it[displayName]="fateme"
+//                it[passwordHash]="1234567"
+//            }
 //            Movies.insert {
 //                it[post_title] = "titleValue"
 //                it[post_description] = "descriptionValue"
@@ -45,7 +54,7 @@ object DataBaseFactory {
         config.isAutoCommit = false
 
         config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-        config.addDataSourceProperty("characterEncoding","utf8")
+        config.addDataSourceProperty("characterEncoding", "utf8")
         return HikariDataSource(config)
     }
 

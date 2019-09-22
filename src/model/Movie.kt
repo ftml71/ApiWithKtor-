@@ -6,6 +6,7 @@ import java.io.Serializable
 
 data class Movie(
     val id: Int,
+    val userId: String,
     val post_title: String?,
     val post_description: String?,
     val post_info: String?,
@@ -23,6 +24,7 @@ data class Movie(
 ) : Serializable
 
 object Movies : IntIdTable() {
+    val user: Column<String> = varchar("user_id", 20). index()
     val post_title: Column<String?> = text("post_title").nullable()
     val post_description: Column<String?> = text("post_description").nullable()
     val post_info: Column<String?> = text("post_info").nullable()

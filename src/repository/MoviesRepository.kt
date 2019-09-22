@@ -1,5 +1,7 @@
 package com.example.repository
 
+import com.example.model.User
+import com.example.model.Users
 import com.example.repository.DataBaseFactory.dbQuery
 import model.Movie
 import model.Movies
@@ -8,6 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class MoviesRepository : Repository {
     override suspend fun add(
+        userId: String,
         titleValue: String,
         descriptionValue: String,
         infoValue: String,
@@ -24,6 +27,7 @@ class MoviesRepository : Repository {
     ) {
         transaction {
             Movies.insert {
+                it[user] = userId
                 it[post_title] = titleValue
                 it[post_description] = descriptionValue
                 it[post_info] = infoValue
@@ -69,9 +73,47 @@ class MoviesRepository : Repository {
         Movies.deleteAll()
     }
 
+    override suspend fun user(userId: String, hash: String?): User? {
+        val user = dbQuery {
+            Users.select {
+                (Users.id eq userId)
+            }.mapNotNull { toUser(it) }.singleOrNull()
+        }
+        return when {
+            user == null -> null
+            hash == null -> user
+            user.passwordHash == hash -> user
+            else -> null
+        }
+    }
+
+    override suspend fun userByEmail(email: String) = dbQuery {
+        Users.select { Users.email.eq(email) }
+            .map {
+                User(
+                    it[Users.id],
+                    email,
+                    it[Users.displayName],
+                    it[Users.passwordHash]
+                )
+            }.singleOrNull()
+    }
+
+    override suspend fun createUser(user: User) {
+        Users.insert {
+            it[id] = user.userId
+            it[displayName] = user.displayName
+            it[email] = user.email
+            it[passwordHash] = user.passwordHash
+        }
+        Unit
+
+    }
+
     private fun toMovie(row: ResultRow): Movie =
         Movie(
             id = row[Movies.id].value,
+            userId = row[Movies.user],
             post_title = row[Movies.post_title],
             post_description = row[Movies.post_description],
             post_info = row[Movies.post_info],
@@ -86,5 +128,13 @@ class MoviesRepository : Repository {
             presenter_name = row[Movies.presenter_name],
             presenter_linkedin_url = row[Movies.presenter_linkedin_url]
 
+        )
+
+    private fun toUser(row: ResultRow): User =
+        User(
+            userId = row[Users.id],
+            email = row[Users.email],
+            displayName = row[Users.displayName],
+            passwordHash = row[Users.passwordHash]
         )
 }
