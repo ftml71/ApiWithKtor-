@@ -19,7 +19,7 @@ interface Repository {
         availabilityValue: String,
         presenterNameValue: String,
         presenterLinkedinUrlValue: String
-    )
+    ) : Movie?
 
     suspend fun movie(id: Int): Movie?
     suspend fun movie(id: String): Movie?
@@ -32,6 +32,7 @@ interface Repository {
 
     suspend fun user(userId: String, hash: String? = null): User?
     suspend fun userByEmail(email: String): User?
+    suspend fun userById(userId: String) : User?
     suspend fun createUser(user: User)
 
 }

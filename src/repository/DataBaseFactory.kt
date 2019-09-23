@@ -16,8 +16,8 @@ object DataBaseFactory {
     fun init() {
         Database.connect(hikari())
         transaction {
-            SchemaUtils.drop(Movies)
-            SchemaUtils.drop(Users)
+//            SchemaUtils.drop(Movies)
+//            SchemaUtils.drop(Users)
             SchemaUtils.create(Movies)
             SchemaUtils.create(Users)
 //            Users.insert {

@@ -6,9 +6,10 @@ import com.example.repository.DataBaseFactory.dbQuery
 import model.Movie
 import model.Movies
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
 
 class MoviesRepository : Repository {
+
+
     override suspend fun add(
         userId: String,
         titleValue: String,
@@ -24,25 +25,30 @@ class MoviesRepository : Repository {
         availabilityValue: String,
         presenterNameValue: String,
         presenterLinkedinUrlValue: String
-    ) {
-        transaction {
-            Movies.insert {
-                it[user] = userId
-                it[post_title] = titleValue
-                it[post_description] = descriptionValue
-                it[post_info] = infoValue
-                it[post_summery] = summeryValue
-                it[post_img] = imgValue
-                it[post_date] = dateValue
-                it[post_gitHub_url] = gitHubUrlValue
-                it[post_slideShare_url] = slideShareUrlValue
-                it[post_aparat_url] = aparatUrlValue
-                it[post_logCat_url] = logCatUrlValue
-                it[availability] = availabilityValue
-                it[presenter_name] = presenterNameValue
-                it[presenter_linkedin_url] = presenterLinkedinUrlValue
-            }
+    ) = dbQuery {
+        val insertStatement = Movies.insert {
+            it[user] = userId
+            it[post_title] = titleValue
+            it[post_description] = descriptionValue
+            it[post_info] = infoValue
+            it[post_summery] = summeryValue
+            it[post_img] = imgValue
+            it[post_date] = dateValue
+            it[post_gitHub_url] = gitHubUrlValue
+            it[post_slideShare_url] = slideShareUrlValue
+            it[post_aparat_url] = aparatUrlValue
+            it[post_logCat_url] = logCatUrlValue
+            it[availability] = availabilityValue
+            it[presenter_name] = presenterNameValue
+            it[presenter_linkedin_url] = presenterLinkedinUrlValue
         }
+        val result = insertStatement.resultedValues?.get(0)
+        if (result != null) {
+            toMovie(result)
+        } else {
+            null
+        }
+
     }
 
     override suspend fun movie(id: Int): Movie? = dbQuery {
@@ -97,6 +103,11 @@ class MoviesRepository : Repository {
                     it[Users.passwordHash]
                 )
             }.singleOrNull()
+    }
+
+    override suspend fun userById(userId: String) = dbQuery {
+        Users.select { Users.id.eq(userId) }
+            .map { User(userId, it[Users.email], it[Users.displayName], it[Users.passwordHash]) }.singleOrNull()
     }
 
     override suspend fun createUser(user: User) {

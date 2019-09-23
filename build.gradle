@@ -46,3 +46,5 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
 
 }
+
+task stage(dependsOn: ['installDist'])

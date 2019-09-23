@@ -1,6 +1,7 @@
 package com.example
 
-import com.example.api.movie
+import com.example.api.login
+import com.example.api.moviesApi
 import com.example.model.EPSession
 import com.example.model.User
 import com.example.repository.DataBaseFactory
@@ -11,6 +12,9 @@ import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.application.install
+import io.ktor.auth.Authentication
+import io.ktor.auth.authentication
+import io.ktor.auth.jwt.jwt
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
 import io.ktor.features.StatusPages
@@ -28,7 +32,6 @@ import io.ktor.request.host
 import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
 import io.ktor.routing.routing
-import io.ktor.sessions.SessionTransportTransformer
 import io.ktor.sessions.SessionTransportTransformerMessageAuthentication
 import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
@@ -68,7 +71,7 @@ fun Application.module(testing: Boolean = false) {
         }
         install(Locations)
         install(Sessions) {
-            cookie<EPSession>("SESSION"){
+            cookie<EPSession>("SESSION") {
                 transform(SessionTransportTransformerMessageAuthentication(hashKey))
             }
         }
@@ -79,17 +82,37 @@ fun Application.module(testing: Boolean = false) {
         DataBaseFactory.init()
 
         val db = MoviesRepository()
+        val jwtService = JwtService()
+
+        install(Authentication) {
+            jwt("jwt") {
+                verifier(jwtService.verifier)
+                realm = "Movies app"
+                validate {
+                    val payload = it.payload
+                    val claim = payload.getClaim("id")
+                    val claimString = claim.asString()
+                    val user = db.userById(claimString)
+                    user
+                }
+            }
+        }
+
         routing {
             static("/static") {
                 resources("images")
             }
+            //webapp
             home(db)
             aboute(db)
-            movie(db)
-            Movies(db,hashFunction)
+            Movies(db, hashFunction)
             signin(db, hashFunction)
             signout()
             signup(db, hashFunction)
+
+            //API
+            login(db, jwtService)
+            moviesApi(db)
         }
 
     }
@@ -104,8 +127,8 @@ fun ApplicationCall.refererHost() = request.header(HttpHeaders.Referrer)?.let { 
 fun ApplicationCall.securityCode(date: Long, user: User, hashFunction: (String) -> String) =
     hashFunction("$date:${user.userId}:${request.host()}:${refererHost()}")
 
-
 fun ApplicationCall.verifyCode(date: Long, user: User, code: String, hashFunction: (String) -> String) =
     securityCode(date, user, hashFunction) == code &&
             (System.currentTimeMillis() - date).let { it > 0 && it < TimeUnit.MILLISECONDS.convert(2, TimeUnit.HOURS) }
 
+val ApplicationCall.apiUser get() = authentication.principal<User>()
